@@ -117,7 +117,7 @@
     input[type="range"] { width: 100%; accent-color: var(--accent); }
     textarea { min-height: 68px; resize: vertical; }
     .row { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }
-    .note { font-size: 0.76rem; color: var(--muted); margin-top: 3px; }
+    .note { font-size: 0.76rem; color: var(--muted); margin-top: 4px; }
 
     .btn {
       background: var(--accent);
@@ -151,37 +151,24 @@
     }
     .btn-mini.danger { background: #fee2e2; color: #b91c1c; }
 
-    .drop-zone {
-      position: relative;
+    .upload-box {
       border: 2px dashed #2563eb;
       background: #eff6ff;
       border-radius: 10px;
-      padding: 0.95rem 0.75rem;
-      text-align: center;
-      cursor: pointer;
-      margin-bottom: 0.75rem;
-      overflow: hidden;
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
     }
-    .drop-zone:hover, .drop-zone.dragover { background: #dbeafe; border-color: #1d4ed8; }
-    .drop-zone-btn {
-      display: inline-block;
-      background: var(--accent);
-      color: #fff;
-      padding: 0.42rem 0.9rem;
+    .upload-box.dragover { background: #dbeafe; border-color: #1d4ed8; }
+    .upload-box input[type="file"] {
+      display: block;
+      width: 100%;
+      margin-top: 0.4rem;
+      padding: 0.4rem;
+      background: #ffffff;
+      border: 1px solid #93c5fd;
       border-radius: 7px;
       font-size: 0.84rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .drop-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
       cursor: pointer;
-      z-index: 10;
-      font-size: 100px;
     }
 
     .photo-grid {
@@ -283,7 +270,7 @@
       <h1>NSTI Calicut — Instagram Post, Carousel &amp; Reel Studio</h1>
       <p>National Skill Training Institute Calicut, Kozhikode, Keralam/DGT/MSDE • nsti.calicut.dgt.gov.in</p>
     </div>
-    <span class="badge-pill">Instagram Creator Suite</span>
+    <span class="badge-pill">Creator Suite v1.2</span>
   </header>
 
   <main>
@@ -296,10 +283,12 @@
           <button type="button" class="mode-tab" data-mode="reel">3. Reel Video</button>
         </div>
 
-        <div class="drop-zone" id="dropZone">
-          <span class="drop-zone-btn">+ Select / Upload Event Photos (1–10)</span>
-          <div class="note">Tap anywhere in this box or drag &amp; drop Landscape &amp; Portrait photos</div>
+        <div class="upload-box" id="dropZone">
+          <label for="fileInput" style="color:var(--primary); font-size:0.86rem; margin-bottom:2px;">
+            Upload Event Photos (1–10 Photos)
+          </label>
           <input type="file" id="fileInput" accept="image/*" multiple />
+          <div class="note">Click <b>Choose Files</b> above or drag &amp; drop Landscape &amp; Portrait photos here</div>
         </div>
 
         <div class="form-group">
@@ -834,7 +823,7 @@
         ctx.fillStyle = "#94a3b8";
         ctx.font = "700 26px Arial, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("Tap '+ Select / Upload Event Photos' to Begin", box.x + box.w / 2, box.y + box.h / 2);
+        ctx.fillText("Click 'Choose Files' Above to Upload Photos", box.x + box.w / 2, box.y + box.h / 2);
         ctx.restore();
         return;
       }
