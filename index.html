@@ -152,15 +152,25 @@
     .btn-mini.danger { background: #fee2e2; color: #b91c1c; }
 
     .drop-zone {
+      display: block;
+      position: relative;
       border: 2px dashed #93c5fd;
       background: #eff6ff;
       border-radius: 10px;
-      padding: 0.75rem;
+      padding: 0.85rem;
       text-align: center;
       cursor: pointer;
       margin-bottom: 0.75rem;
+      user-select: none;
     }
-    .drop-zone.dragover { background: #dbeafe; border-color: var(--accent); }
+    .drop-zone:hover, .drop-zone.dragover { background: #dbeafe; border-color: var(--accent); }
+    .drop-zone input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+    }
 
     .photo-grid {
       display: grid;
@@ -274,11 +284,11 @@
           <button type="button" class="mode-tab" data-mode="reel">3. Reel Video</button>
         </div>
 
-        <div class="drop-zone" id="dropZone">
+        <label for="fileInput" class="drop-zone" id="dropZone">
           <strong>+ Upload Event Photos (1–10 Photos)</strong>
           <div class="note">Supports both Landscape &amp; Portrait photos • Drag &amp; drop or tap to select</div>
-          <input type="file" id="fileInput" accept="image/*" multiple class="hidden" />
-        </div>
+          <input type="file" id="fileInput" accept="image/*" multiple />
+        </label>
 
         <div class="form-group">
           <label for="campaignSelect">Campaign / Event Category (Auto-Adds Official Mentions &amp; Tags)</label>
@@ -548,7 +558,6 @@
 
     /* ================= Photo Upload & Framing ================= */
     const dropZone = $("dropZone");
-    dropZone.addEventListener("click", () => $("fileInput").click());
     dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
     dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
     dropZone.addEventListener("drop", (e) => {
@@ -802,7 +811,7 @@
         ctx.fillStyle = "#94a3b8";
         ctx.font = "700 26px Arial, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("Upload Event Photos to Preview", box.x + box.w / 2, box.y + box.h / 2);
+        ctx.fillText("Tap '+ Upload Event Photos' to Begin", box.x + box.w / 2, box.y + box.h / 2);
         ctx.restore();
         return;
       }
@@ -982,7 +991,6 @@
       const dt = formatDate($("eventDate").value);
 
       if (slideIndex === 0) {
-        // Slide 1: Hook Cover
         sceneCells = [{ i: 0, x: 48, y: 48, w: W - 96, h: 660 }];
         drawClippedPhoto(photos[0], sceneCells[0], 20);
 
@@ -999,7 +1007,6 @@
         let y = 835;
         wrapText(title, W - 96, 3).forEach((l) => { ctx.fillText(l, 48, y); y += 54; });
 
-        // Swipe CTA Pill
         ctx.fillStyle = pal.gold;
         ctx.beginPath();
         ctx.roundRect(W - 250, workH - 72, 202, 44, 22);
@@ -1009,7 +1016,6 @@
         ctx.textAlign = "center";
         ctx.fillText("SWIPE FOR MORE →", W - 149, workH - 44);
       } else if (slideIndex === total - 1) {
-        // Final Slide: Summary & CTA
         sceneCells = [];
         ctx.fillStyle = pal.gold;
         ctx.fillRect(68, 120, 120, 8);
@@ -1034,7 +1040,6 @@
         ctx.textAlign = "center";
         ctx.fillText(`VISIT OFFICIAL PORTAL: ${OFFICIAL_SITE}`, W / 2, workH - 94);
       } else {
-        // Middle Photo Slides
         const pIdx = slideIndex - 1;
         const p = photos[pIdx];
         sceneCells = [{ i: pIdx, x: 44, y: 44, w: W - 88, h: workH - 165 }];
@@ -1057,4 +1062,329 @@
 
     /* ================= Render Reel Frame (9:16 — 1080 x 1920) ================= */
     function drawReelFrame(progress, forExport = false) {
-      const
+      const W = 1080, H = 1920;
+      canvas.width = W;
+      canvas.height = H;
+      const footerH = 116;
+      const workH = H - footerH;
+
+      const shift = Math.sin(progress * Math.PI * 2) * 140;
+      const bg = ctx.createLinearGradient(0, shift, W, workH - shift);
+      bg.addColorStop(0, "#0f294a");
+      bg.addColorStop(0.5, "#1e3a8a");
+      bg.addColorStop(1, "#091526");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      const title = ($("eventTitle").value.trim() || "CAMPUS HIGHLIGHTS — NSTI CALICUT").toUpperCase();
+      const dt = formatDate($("eventDate").value);
+
+      if (!photos.length) {
+        drawClippedPhoto(null, { x: 60, y: 320, w: W - 120, h: 1100 }, 24);
+      } else {
+        const count = photos.length;
+        const rawPos = progress * count;
+        const idx = Math.min(count - 1, Math.floor(rawPos));
+        const localT = rawPos - idx;
+        const p = photos[idx];
+        const nextP = photos[(idx + 1) % count];
+        const trans = $("reelTransition").value;
+
+        ctx.fillStyle = "#eab308";
+        ctx.beginPath();
+        ctx.roundRect(64, 150, 210, 38, 19);
+        ctx.fill();
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "900 18px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`${dt.day} ${dt.month} ${dt.year}`, 169, 175);
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 42px Arial, sans-serif";
+        let hy = 242;
+        wrapText(title, W - 128, 2).forEach((l) => { ctx.fillText(l, 64, hy); hy += 50; });
+
+        const box = { x: 54, y: hy + 20, w: W - 108, h: 1040 };
+        sceneCells = [{ i: idx, ...box }];
+
+        if (trans === "slide" && localT > 0.72 && count > 1) {
+          const slideT = (localT - 0.72) / 0.28;
+          drawClippedPhoto(p, { x: box.x - slideT * W, y: box.y, w: box.w, h: box.h }, 24);
+          drawClippedPhoto(nextP, { x: box.x + (1 - slideT) * W, y: box.y, w: box.w, h: box.h }, 24);
+        } else {
+          const savedZoom = p.zoom;
+          if (trans === "kenburns") p.zoom = savedZoom * (1 + localT * 0.14);
+          else if (trans === "pulse") p.zoom = savedZoom * (1 + Math.sin(localT * Math.PI) * 0.1);
+          drawClippedPhoto(p, box, 24);
+          p.zoom = savedZoom;
+
+          if (trans === "wipe" && localT > 0.75 && count > 1) {
+            const wipeW = ((localT - 0.75) / 0.25) * box.w;
+            drawClippedPhoto(nextP, { x: box.x, y: box.y, w: wipeW, h: box.h }, 24);
+          }
+        }
+
+        const slideLabel = p.label || `Highlight ${idx + 1} of ${count}`;
+        ctx.fillStyle = "rgba(15, 41, 74, 0.92)";
+        ctx.beginPath();
+        ctx.roundRect(64, box.y + box.h + 26, W - 220, 62, 14);
+        ctx.fill();
+        ctx.strokeStyle = "#eab308";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "800 26px Arial, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(slideLabel, 88, box.y + box.h + 65, W - 260);
+      }
+
+      drawInstitutionalFooter(W, H - footerH, footerH, "#0f294a");
+
+      if (!forExport && $("safeZoneChk").checked) {
+        ctx.save();
+        ctx.fillStyle = "rgba(239, 68, 68, 0.24)";
+        ctx.fillRect(0, H - 360, W, 360);
+        ctx.fillRect(W - 150, H - 820, 150, 460);
+        ctx.fillStyle = "#fca5a5";
+        ctx.font = "bold 20px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("INSTAGRAM UI SAFE-ZONE GUIDE (HIDDEN IN EXPORT)", W / 2, H - 372);
+        ctx.restore();
+      }
+    }
+
+    /* ================= Mode Switching & Interactive Framing ================= */
+    function renderPreview() {
+      $("reelPlayer").classList.add("hidden");
+      canvas.classList.remove("hidden");
+
+      if (currentMode === "post") {
+        const r = $("postRatio").value;
+        $("stageTitle").textContent = `Live Preview — Instagram Post (${r})`;
+        $("dimBadge").textContent = r === "1:1" ? "1080 × 1080 px" : r === "9:16" ? "1080 × 1920 px" : "1080 × 1350 px";
+        drawSinglePost();
+      } else if (currentMode === "carousel") {
+        const total = getTotalCarouselSlides();
+        $("stageTitle").textContent = "Live Preview — Swipeable Carousel (4:5)";
+        $("dimBadge").textContent = "1080 × 1350 px";
+        $("slideIndicator").textContent = `Slide ${carouselIdx + 1} of ${total}`;
+        drawCarouselSlide(carouselIdx);
+      } else {
+        $("stageTitle").textContent = "Live Preview — Instagram Reel (9:16)";
+        $("dimBadge").textContent = "1080 × 1920 px";
+        drawReelFrame(0.15, false);
+      }
+    }
+
+    document.querySelectorAll(".mode-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".mode-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentMode = tab.dataset.mode;
+
+        $("postCarouselControls").classList.toggle("hidden", currentMode === "reel");
+        $("postRatioWrap").classList.toggle("hidden", currentMode !== "post");
+        $("layoutWrap").classList.toggle("hidden", currentMode !== "post");
+        $("reelControls").classList.toggle("hidden", currentMode !== "reel");
+        $("carouselNav").classList.toggle("hidden", currentMode !== "carousel");
+
+        $("downloadPostBtn").classList.toggle("hidden", currentMode === "reel");
+        $("downloadAllSlidesBtn").classList.toggle("hidden", currentMode !== "carousel");
+        $("renderReelBtn").classList.toggle("hidden", currentMode !== "reel");
+        $("downloadReelCoverBtn").classList.toggle("hidden", currentMode !== "reel");
+        $("downloadReelLink").classList.add("hidden");
+
+        renderPreview();
+      });
+    });
+
+    $("prevSlideBtn").addEventListener("click", () => {
+      const total = getTotalCarouselSlides();
+      carouselIdx = (carouselIdx - 1 + total) % total;
+      renderPreview();
+    });
+    $("nextSlideBtn").addEventListener("click", () => {
+      const total = getTotalCarouselSlides();
+      carouselIdx = (carouselIdx + 1) % total;
+      renderPreview();
+    });
+
+    canvas.addEventListener("pointerdown", (e) => {
+      const b = canvas.getBoundingClientRect();
+      const x = (e.clientX - b.left) * canvas.width / b.width;
+      const y = (e.clientY - b.top) * canvas.height / b.height;
+      const cell = sceneCells.find((c) => x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h);
+      if (cell && photos[cell.i]) {
+        dragState = { i: cell.i, x, y };
+        canvas.setPointerCapture(e.pointerId);
+      }
+    });
+    canvas.addEventListener("pointermove", (e) => {
+      if (!dragState) return;
+      const b = canvas.getBoundingClientRect();
+      const x = (e.clientX - b.left) * canvas.width / b.width;
+      const y = (e.clientY - b.top) * canvas.height / b.height;
+      const p = photos[dragState.i];
+      p.fx = Math.max(0, Math.min(1, p.fx - (x - dragState.x) / 450));
+      p.fy = Math.max(0, Math.min(1, p.fy - (y - dragState.y) / 450));
+      dragState.x = x;
+      dragState.y = y;
+      renderPreview();
+    });
+    canvas.addEventListener("pointerup", () => { dragState = null; });
+    canvas.addEventListener("wheel", (e) => {
+      if (!photos.length) return;
+      e.preventDefault();
+      const p = photos[0];
+      p.zoom = Math.max(1, Math.min(2.8, p.zoom * (e.deltaY < 0 ? 1.06 : 0.94)));
+      renderPreview();
+    }, { passive: false });
+
+    ["campaignSelect", "eventTitle", "eventDate", "eventDesc", "postRatio", "themeSelect", "layoutSelect", "dividerSelect", "reelTransition", "safeZoneChk"].forEach((id) => {
+      $(id).addEventListener("input", () => {
+        updateCaption();
+        renderPreview();
+      });
+    });
+
+    /* ================= JPG & Carousel Downloads ================= */
+    $("downloadPostBtn").addEventListener("click", () => {
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL("image/jpeg", 0.92);
+      a.download = currentMode === "carousel"
+        ? `NSTI_Calicut_Slide_${carouselIdx + 1}.jpg`
+        : "NSTI_Calicut_Instagram_Post.jpg";
+      a.click();
+    });
+
+    $("downloadAllSlidesBtn").addEventListener("click", async () => {
+      const total = getTotalCarouselSlides();
+      for (let i = 0; i < total; i++) {
+        drawCarouselSlide(i);
+        const a = document.createElement("a");
+        a.href = canvas.toDataURL("image/jpeg", 0.92);
+        a.download = `NSTI_Calicut_Carousel_Slide_${i + 1}.jpg`;
+        a.click();
+        await new Promise((r) => setTimeout(r, 250));
+      }
+      drawCarouselSlide(carouselIdx);
+      showToast(`Downloaded all ${total} carousel slides!`);
+    });
+
+    $("downloadReelCoverBtn").addEventListener("click", () => {
+      drawReelFrame(0.05, true);
+      const a = document.createElement("a");
+      a.href = canvas.toDataURL("image/jpeg", 0.92);
+      a.download = "NSTI_Calicut_Reel_Cover.jpg";
+      a.click();
+      drawReelFrame(0.15, false);
+    });
+
+    /* ================= Web Audio Synthesizer + Reel Video Recorder ================= */
+    $("customAudio").addEventListener("change", (e) => {
+      customAudioFile = e.target.files[0] || null;
+    });
+
+    function createSynthAudioStream(style, durationSec) {
+      if (style === "none") return null;
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const dest = audioCtx.createMediaStreamDestination();
+      const master = audioCtx.createGain();
+      master.gain.value = 0.16;
+      master.connect(dest);
+
+      const chords = style === "uplift"
+        ? [[261.6, 329.6, 392.0], [293.7, 349.2, 440.0], [329.6, 392.0, 493.9], [349.2, 440.0, 523.3]]
+        : style === "pulse"
+        ? [[220.0, 261.6, 329.6], [246.9, 293.7, 369.9], [261.6, 329.6, 392.0], [293.7, 349.2, 440.0]]
+        : [[261.6, 392.0, 493.9], [220.0, 329.6, 440.0], [174.6, 261.6, 349.2], [196.0, 293.7, 392.0]];
+
+      const now = audioCtx.currentTime;
+      const step = 1.5;
+      for (let t = 0; t < durationSec; t += step) {
+        const chord = chords[Math.floor(t / step) % chords.length];
+        chord.forEach((freq) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = style === "pulse" ? "triangle" : "sine";
+          osc.frequency.setValueAtTime(freq, now + t);
+          gain.gain.setValueAtTime(0.001, now + t);
+          gain.gain.exponentialRampToValueAtTime(0.22, now + t + 0.15);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + t + step - 0.05);
+          osc.connect(gain);
+          gain.connect(master);
+          osc.start(now + t);
+          osc.stop(now + t + step);
+        });
+      }
+      return { stream: dest.stream, close: () => audioCtx.close() };
+    }
+
+    $("renderReelBtn").addEventListener("click", async () => {
+      if (!photos.length) {
+        alert("Please upload at least 1 photo first to generate a Reel video.");
+        return;
+      }
+      const btn = $("renderReelBtn");
+      const status = $("renderStatus");
+      btn.disabled = true;
+      $("downloadReelLink").classList.add("hidden");
+      $("reelPlayer").classList.add("hidden");
+      canvas.classList.remove("hidden");
+
+      const secPerSlide = Number($("slideSec").value) || 3;
+      const totalDuration = photos.length * secPerSlide;
+      const fps = 30;
+      const totalFrames = Math.round(totalDuration * fps);
+
+      const canvasStream = canvas.captureStream(fps);
+      const synth = createSynthAudioStream($("bgMusicSelect").value, totalDuration + 0.5);
+      const tracks = [...canvasStream.getVideoTracks()];
+      if (synth) tracks.push(...synth.stream.getAudioTracks());
+
+      const combinedStream = new MediaStream(tracks);
+      const mimeType = MediaRecorder.isTypeSupported("video/mp4")
+        ? "video/mp4"
+        : "video/webm;codecs=vp9";
+      const recorder = new MediaRecorder(combinedStream, { mimeType, videoBitsPerSecond: 4500000 });
+      const chunks = [];
+
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = () => {
+        if (synth) synth.close();
+        const blob = new Blob(chunks, { type: mimeType });
+        const videoUrl = URL.createObjectURL(blob);
+        const ext = mimeType.includes("mp4") ? "mp4" : "webm";
+
+        const player = $("reelPlayer");
+        player.src = videoUrl;
+        canvas.classList.add("hidden");
+        player.classList.remove("hidden");
+        player.play().catch(() => {});
+
+        const dl = $("downloadReelLink");
+        dl.href = videoUrl;
+        dl.download = `NSTI_Calicut_Reel.${ext}`;
+        dl.classList.remove("hidden");
+
+        status.textContent = `Reel ready (${totalDuration.toFixed(1)}s)! Tap 'Save Reel Video' to download.`;
+        btn.disabled = false;
+      };
+
+      recorder.start();
+      for (let f = 0; f <= totalFrames; f++) {
+        const progress = f / totalFrames;
+        drawReelFrame(progress, true);
+        status.textContent = `Rendering Reel Video: ${Math.round(progress * 100)}%`;
+        await new Promise((r) => setTimeout(r, 1000 / fps));
+      }
+      recorder.stop();
+    });
+
+    updateCaption();
+    renderPreview();
+  </script>
+</body>
+</html>
