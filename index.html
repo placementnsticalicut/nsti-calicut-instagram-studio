@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NSTI Calicut — Instagram Post, Carousel &amp; Reel Studio</title>
+  <style>
+    :root {
+      --primary: #0f294a;
+      --accent: #155eef;
+      --ig: #e1306c;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    header {
+      background: linear-gradient(135deg, #0f294a 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 0.95rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.16);
+    }
+    header h1 { font-size: 1.12rem; font-weight: 800; }
+    header p { font-size: 0.78rem; color: #cbd5e1; margin-top: 2px; }
+    .badge-pill {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    main {
+      max-width: 1320px;
+      margin: 1.15rem auto;
+      padding: 0 1rem 3rem;
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 1.15rem;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      margin-bottom: 1rem;
+    }
+    .panel h2 {
+      font-size: 0.96rem;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: #e2e8f0;
+      padding: 5px;
+      border-radius: 10px;
+      margin-bottom: 0.9rem;
+    }
+    .mode-tab {
+      border: none;
+      background: transparent;
+      padding: 0.5rem 0.4rem;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+    }
+    .mode-tab.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+
+    .form-group { margin-bottom: 0.75rem; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.28rem; color: #1e293b; }
+    label.chk { font-weight: 400; display: flex; align-items: center; gap: 6px; cursor: pointer; margin-top: 5px; font-size: 0.8rem; }
+    input[type="text"], input[type="date"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 0.46rem 0.62rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 0.86rem;
+      font-family: inherit;
+      background: #fff;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    textarea { min-height: 68px; resize: vertical; }
+    .row { display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center; }
+    .note { font-size: 0.76rem; color: var(--muted); margin-top: 3px; }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.48rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+    .btn:hover { opacity: 0.92; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .btn-green { background: #16a34a; }
+    .btn-dark { background: #0f294a; }
+    .btn-secondary { background: #e2e8f0; color: #0f172a; }
+    .btn-mini {
+      padding: 4px 7px;
+      font-size: 0.74rem;
+      border-radius: 5px;
+      border: none;
+      background: #e2e8f0;
+      color: #0f172a;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-mini.danger { background: #fee2e2; color: #b91c1c; }
+
+    .drop-zone {
+      border: 2px dashed #93c5fd;
+      background: #eff6ff;
+      border-radius: 10px;
+      padding: 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 0.75rem;
+    }
+    .drop-zone.dragover { background: #dbeafe; border-color: var(--accent); }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      gap: 8px;
+      margin-top: 0.6rem;
+    }
+    .photo-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 6px;
+      font-size: 0.76rem;
+    }
+    .photo-card img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: contain;
+      background: #0f172a;
+      border-radius: 4px;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .photo-card input[type="text"] {
+      padding: 0.3rem 0.45rem;
+      font-size: 0.76rem;
+      margin-bottom: 5px;
+      border-color: #93c5fd;
+    }
+
+    /* Stage & Preview */
+    .stage-panel {
+      position: sticky;
+      top: 1rem;
+    }
+    .canvas-box {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #studioCanvas {
+      max-width: 100%;
+      max-height: 68vh;
+      width: auto;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+      background: #0f172a;
+      cursor: grab;
+      touch-action: none;
+    }
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 0.65rem;
+      background: #f8fafc;
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+    }
+    .caption-output {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 0.84rem;
+      white-space: pre-line;
+      color: #0f172a;
+      min-height: 115px;
+    }
+    .hidden { display: none !important; }
+    #toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f294a;
+      color: #fff;
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      z-index: 999;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>NSTI Calicut — Instagram Post, Carousel &amp; Reel Studio</h1>
+      <p>National Skill Training Institute Calicut, Kozhikode, Keralam/DGT/MSDE • nsti.calicut.dgt.gov.in</p>
+    </div>
+    <span class="badge-pill">Instagram Creator Suite</span>
+  </header>
+
+  <main>
+    <!-- LEFT CONTROLS -->
+    <div>
+      <div class="panel">
+        <div class="mode-tabs">
+          <button type="button" class="mode-tab active" data-mode="post">1. Single Post</button>
+          <button type="button" class="mode-tab" data-mode="carousel">2. Carousel Deck</button>
+          <button type="button" class="mode-tab" data-mode="reel">3. Reel Video</button>
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+          <strong>+ Upload Event Photos (1–10 Photos)</strong>
+          <div class="note">Supports both Landscape &amp; Portrait photos • Drag &amp; drop or tap to select</div>
+          <input type="file" id="fileInput" accept="image/*" multiple class="hidden" />
+        </div>
+
+        <div class="form-group">
+          <label for="campaignSelect">Campaign / Event Category (Auto-Adds Official Mentions &amp; Tags)</label>
+          <select id="campaignSelect">
+            <option value="general">General Campus Event / Workshop</option>
+            <option value="swachhata">Swachhata Day / Swachh Bharat Cleanliness Drive</option>
+            <option value="placement">Campus Placement Drive / Rozgar Mela</option>
+            <option value="solar">PM Surya Ghar / Green Skill &amp; Solar Training</option>
+            <option value="national">National Day / Constitution Day / Independence Day</option>
+            <option value="cits">CITS / CTS Skill Training &amp; Convocation</option>
+          </select>
+        </div>
+
+        <div class="row-2">
+          <div class="form-group">
+            <label for="eventTitle">Headline / Hook Title</label>
+            <input type="text" id="eventTitle" value="SWACHHATA HI SEVA DRIVE AT NSTI CALICUT" />
+          </div>
+          <div class="form-group">
+            <label for="eventDate">Event Date</label>
+            <input type="date" id="eventDate" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="eventDesc">Event Highlights / Key Points</label>
+          <textarea id="eventDesc">Faculty, staff, and CITS &amp; CTS trainees actively participated in the campus cleanliness pledge and shramdaan drive led by the Principal at NSTI Calicut.</textarea>
+        </div>
+
+        <!-- POST & CAROUSEL CONTROLS -->
+        <div id="postCarouselControls">
+          <div class="row-2">
+            <div class="form-group" id="postRatioWrap">
+              <label for="postRatio">Instagram Format</label>
+              <select id="postRatio">
+                <option value="4:5">Portrait Post (4:5 — 1080 × 1350)</option>
+                <option value="1:1">Square Post (1:1 — 1080 × 1080)</option>
+                <option value="9:16">Story Poster (9:16 — 1080 × 1920)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="themeSelect">Visual Theme</label>
+              <select id="themeSelect">
+                <option value="navy">NSTI Royal Navy &amp; Gold</option>
+                <option value="gradient">Modern Gradient Overlay</option>
+                <option value="tricolor">National Tricolor &amp; Cream</option>
+                <option value="split">Editorial Split News Card</option>
+                <option value="crimson">Imperial Crimson &amp; Gold</option>
+                <option value="gallery">Clean Gallery Frame</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row-2" id="layoutWrap">
+            <div class="form-group">
+              <label for="layoutSelect">Multi-Photo Layout</label>
+              <select id="layoutSelect">
+                <option value="smart">Smart Orientation (No Side Crop)</option>
+                <option value="stack">Horizontal Stacked Rows</option>
+                <option value="hero-top">Hero Top + Row Below</option>
+                <option value="grid">2-Row Grid</option>
+                <option value="row">Side-by-Side Columns</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="dividerSelect">Divider Style</label>
+              <select id="dividerSelect">
+                <option value="rounded">Rounded Frames</option>
+                <option value="straight">Clean Straight</option>
+                <option value="slant">Dynamic Slant / /</option>
+                <option value="wave">Curved Wave</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- REEL VIDEO CONTROLS -->
+        <div id="reelControls" class="hidden">
+          <div class="row-2">
+            <div class="form-group">
+              <label for="reelTransition">Transition Effect</label>
+              <select id="reelTransition">
+                <option value="kenburns">Ken Burns Zoom + Crossfade</option>
+                <option value="slide">Dynamic Horizontal Slide</option>
+                <option value="wipe">Gradient Sweep Wipe</option>
+                <option value="pulse">Smooth Zoom Pulse</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="slideSec">Seconds per Photo</label>
+              <select id="slideSec">
+                <option value="2.2">2.2s (Fast Hook Pace)</option>
+                <option value="3" selected>3.0s (Balanced)</option>
+                <option value="4">4.0s (Detailed Read)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row-2">
+            <div class="form-group">
+              <label for="bgMusicSelect">Built-in Background Music</label>
+              <select id="bgMusicSelect">
+                <option value="none">No Audio (Silent)</option>
+                <option value="corporate" selected>Corporate Innovation (Synth Pad)</option>
+                <option value="uplift">Ceremonial Uplift (Chords)</option>
+                <option value="pulse">Modern Tech Pulse (Beat)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="customAudio">Or Upload MP3/WAV</label>
+              <input type="file" id="customAudio" accept="audio/*" />
+            </div>
+          </div>
+
+          <label class="chk">
+            <input type="checkbox" id="safeZoneChk" checked />
+            Show Instagram Reel Safe-Zone Guide (Preview only — hidden in export)
+          </label>
+        </div>
+
+        <!-- UPLOADED PHOTOS LIST -->
+        <div id="photoListWrap" class="hidden">
+          <label style="margin-top:0.6rem;">Uploaded Photos &amp; Individual Slide Captions</label>
+          <div class="note">Drag photo on canvas to reposition • Scroll wheel to zoom</div>
+          <div id="photoGrid" class="photo-grid"></div>
+        </div>
+      </div>
+
+      <!-- INSTAGRAM CAPTION & OFFICIAL MENTIONS BUILDER -->
+      <div class="panel">
+        <h2>
+          <span>Instagram Caption, Mentions &amp; Tags</span>
+          <button type="button" id="refreshCaptionBtn" class="btn btn-mini">Regenerate</button>
+        </h2>
+        <div id="captionBox" class="caption-output" contenteditable="true"></div>
+        <div class="row" style="margin-top:0.65rem;">
+          <button type="button" id="copyCaptionBtn" class="btn btn-dark">Copy Caption, Mentions &amp; Hashtags</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT LIVE PREVIEW & EXPORT -->
+    <div class="stage-panel">
+      <div class="panel">
+        <h2>
+          <span id="stageTitle">Live Preview — Instagram Post (4:5)</span>
+          <span id="dimBadge" class="note" style="font-weight:700;">1080 × 1350 px</span>
+        </h2>
+
+        <div class="canvas-box">
+          <canvas id="studioCanvas" width="1080" height="1350"></canvas>
+          <video id="reelPlayer" controls playsinline class="hidden" style="max-width:100%; max-height:66vh; border-radius:6px;"></video>
+        </div>
+
+        <!-- Carousel Slide Switcher -->
+        <div id="carouselNav" class="carousel-nav hidden">
+          <button type="button" id="prevSlideBtn" class="btn-mini">◀ Prev Slide</button>
+          <strong id="slideIndicator" style="font-size:0.82rem;">Slide 1 of 3</strong>
+          <button type="button" id="nextSlideBtn" class="btn-mini">Next Slide ▶</button>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="row" style="margin-top:0.85rem; justify-content:center;">
+          <button type="button" id="downloadPostBtn" class="btn btn-ig">Download High-Res JPG</button>
+          <button type="button" id="downloadAllSlidesBtn" class="btn btn-dark hidden">Download All Carousel Slides</button>
+          <button type="button" id="renderReelBtn" class="btn btn-ig hidden">Generate Reel Video</button>
+          <button type="button" id="downloadReelCoverBtn" class="btn btn-secondary hidden">Download Reel Cover JPG</button>
+          <a id="downloadReelLink" class="btn btn-green hidden" download="NSTI_Calicut_Reel.webm">Save Reel Video</a>
+        </div>
+        <div id="renderStatus" class="note" style="text-align:center; margin-top:6px; font-weight:700; color:var(--primary);"></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="hidden"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const canvas = $("studioCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const INSTITUTE_LINE = "National Skill Training Institute Calicut, Kozhikode, Keralam/DGT/MSDE";
+    const OFFICIAL_SITE = "nsti.calicut.dgt.gov.in";
+
+    const todayIso = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    $("eventDate").value = todayIso;
+
+    let currentMode = "post"; // "post" | "carousel" | "reel"
+    let photos = [];
+    let carouselIdx = 0;
+    let sceneCells = [];
+    let dragState = null;
+    let customAudioFile = null;
+
+    function showToast(msg) {
+      const t = $("toast");
+      t.textContent = msg;
+      t.classList.remove("hidden");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => t.classList.add("hidden"), 3800);
+    }
+
+    function formatDate(iso) {
+      const [y, m, d] = (iso || todayIso).split("-").map(Number);
+      const dt = new Date(y || 2026, (m || 1) - 1, d || 1);
+      return {
+        day: String(dt.getDate()).padStart(2, "0"),
+        month: dt.toLocaleDateString("en-IN", { month: "short" }).toUpperCase(),
+        year: String(dt.getFullYear()),
+        full: dt.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+      };
+    }
+
+    /* ================= Campaign Mentions & Caption Generator ================= */
+    const CAMPAIGN_DATA = {
+      general: {
+        emoji: "✨",
+        mentions: "@dgt_msde @skillindia @msde_india",
+        tags: "#NSTICalicut #SkillIndia #DGT #MSDE #CITS #ITI #Kozhikode #Kerala #VocationalTraining"
+      },
+      swachhata: {
+        emoji: "🌿🧹",
+        mentions: "@dgt_msde @skillindia @msde_india @swachhbharat @swachhbharatgov @mygovindia @pibindia",
+        tags: "#SwachhataHiSeva #SwachhBharat #NSTICalicut #SkillIndia #DGT #MSDE #CleanCampus #Kozhikode #GreenCampus"
+      },
+      placement: {
+        emoji: "💼🎯",
+        mentions: "@dgt_msde @skillindia @msde_india @nsdcindia",
+        tags: "#RozgarMela #CampusPlacement #NSTICalicut #SkillIndia #DGT #MSDE #CITS #ITI #Careers #Kozhikode"
+      },
+      solar: {
+        emoji: "☀️⚡",
+        mentions: "@dgt_msde @skillindia @msde_india @mnreindia @mygovindia",
+        tags: "#PMSuryaGhar #GreenSkills #SolarEnergy #NSTICalicut #SkillIndia #DGT #MSDE #RenewableEnergy #Kozhikode"
+      },
+      national: {
+        emoji: "🇮🇳",
+        mentions: "@dgt_msde @skillindia @msde_india @mygovindia @pibindia",
+        tags: "#India #NSTICalicut #SkillIndia #DGT #MSDE #NewIndia #Kozhikode #Keralam"
+      },
+      cits: {
+        emoji: "🛠️🎓",
+        mentions: "@dgt_msde @skillindia @msde_india",
+        tags: "#CITS #CTS #SkillIndia #DGT #MSDE #NSTICalicut #ITI #TechnicalEducation #Kozhikode"
+      }
+    };
+
+    function updateCaption() {
+      const cat = CAMPAIGN_DATA[$("campaignSelect").value] || CAMPAIGN_DATA.general;
+      const title = $("eventTitle").value.trim() || "Campus Update at NSTI Calicut";
+      const desc = $("eventDesc").value.trim();
+      const dt = formatDate($("eventDate").value).full;
+
+      const text = `${cat.emoji} ${title} (${dt})\n\n${desc}\n\n🏛️ ${INSTITUTE_LINE}\n🔗 Official Portal: ${OFFICIAL_SITE}\n\n${cat.mentions}\n\n${cat.tags}`;
+      $("captionBox").textContent = text;
+    }
+
+    $("refreshCaptionBtn").addEventListener("click", updateCaption);
+    $("copyCaptionBtn").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText($("captionBox").textContent);
+        showToast("Instagram caption, official mentions & hashtags copied!");
+      } catch (e) {
+        showToast("Select and copy the caption text above.");
+      }
+    });
+
+    /* ================= Photo Upload & Framing ================= */
+    const dropZone = $("dropZone");
+    dropZone.addEventListener("click", () => $("fileInput").click());
+    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      handleFiles(e.dataTransfer.files);
+    });
+    $("fileInput").addEventListener("change", (e) => handleFiles(e.target.files));
+
+    function loadImg(url) {
+      return new Promise((res, rej) => {
+        const im = new Image();
+        im.onload = () => res(im);
+        im.onerror = rej;
+        im.src = url;
+      });
+    }
+
+    async function handleFiles(fileList) {
+      const files = [...fileList].filter((f) => f.type.startsWith("image/"));
+      if (!files.length) return;
+      for (const f of files.slice(0, 10 - photos.length)) {
+        const url = URL.createObjectURL(f);
+        try {
+          const img = await loadImg(url);
+          photos.push({
+            img,
+            url,
+            name: f.name,
+            label: "",
+            fx: 0.5,
+            fy: 0.5,
+            zoom: 1,
+            aspect: img.naturalWidth / img.naturalHeight
+          });
+        } catch (e) {
+          URL.revokeObjectURL(url);
+        }
+      }
+      $("fileInput").value = "";
+      carouselIdx = 0;
+      renderPhotoCards();
+      renderPreview();
+    }
+
+    function renderPhotoCards() {
+      const wrap = $("photoListWrap");
+      const grid = $("photoGrid");
+      wrap.classList.toggle("hidden", photos.length === 0);
+      grid.innerHTML = "";
+      photos.forEach((p, i) => {
+        const card = document.createElement("div");
+        card.className = "photo-card";
+        card.innerHTML = `
+          <img src="${p.url}" alt="Photo ${i + 1}" />
+          <input type="text" placeholder="Slide/Photo ${i + 1} label (e.g. Pledge)" value="${p.label.replace(/"/g, "&quot;")}" />
+          <div class="row" style="justify-content:space-between; margin-bottom:4px;">
+            <div>
+              <button type="button" class="btn-mini" data-act="left" ${i === 0 ? "disabled" : ""}>◀</button>
+              <button type="button" class="btn-mini" data-act="right" ${i === photos.length - 1 ? "disabled" : ""}>▶</button>
+              <button type="button" class="btn-mini" data-act="reset">Reset</button>
+            </div>
+            <button type="button" class="btn-mini danger" data-act="del">✕</button>
+          </div>
+          <input type="range" min="100" max="280" value="${Math.round(p.zoom * 100)}" />
+        `;
+        card.querySelector('input[type="text"]').addEventListener("input", (e) => {
+          p.label = e.target.value;
+          renderPreview();
+        });
+        card.querySelector('input[type="range"]').addEventListener("input", (e) => {
+          p.zoom = Number(e.target.value) / 100;
+          renderPreview();
+        });
+        card.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+          const act = b.dataset.act;
+          if (act === "left" && i > 0) [photos[i], photos[i - 1]] = [photos[i - 1], photos[i]];
+          else if (act === "right" && i < photos.length - 1) [photos[i], photos[i + 1]] = [photos[i + 1], photos[i]];
+          else if (act === "reset") { p.fx = 0.5; p.fy = 0.5; p.zoom = 1; }
+          else if (act === "del") {
+            URL.revokeObjectURL(p.url);
+            photos.splice(i, 1);
+            carouselIdx = Math.min(carouselIdx, Math.max(0, getTotalCarouselSlides() - 1));
+          }
+          renderPhotoCards();
+          renderPreview();
+        }));
+        grid.appendChild(card);
+      });
+    }
+
+    /* ================= High-Resolution Official Logos (DGT, Skill India, ITI) ================= */
+    function drawDgtLogo(cx, cy, s) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(s, s);
+      const teeth = 16, rOuter = 25, rInner = 20.5;
+      ctx.beginPath();
+      for (let i = 0; i < teeth * 2; i++) {
+        const ang = (i * Math.PI) / teeth;
+        const r = i % 2 === 0 ? rOuter : rInner;
+        const x = Math.cos(ang) * r, y = Math.sin(ang) * r;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = "#172554";
+      ctx.fill();
+      ctx.beginPath(); ctx.arc(0, 0, 17.5, 0, Math.PI * 2); ctx.fillStyle = "#ffffff"; ctx.fill();
+
+      ctx.save(); ctx.translate(-7.5, -6.5); ctx.rotate(-0.65); ctx.fillStyle = "#15803d";
+      ctx.fillRect(-4.5, -3.5, 9, 3.8); ctx.fillRect(-1.4, 0, 2.8, 10); ctx.restore();
+
+      ctx.save(); ctx.translate(7.5, -6.5); ctx.rotate(0.65); ctx.fillStyle = "#ea580c";
+      ctx.fillRect(-1.6, -4.5, 3.2, 11); ctx.beginPath(); ctx.arc(0, -5.5, 3.8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(-1.3, -8.5, 2.6, 3.5); ctx.restore();
+
+      ctx.beginPath(); ctx.moveTo(2, -15); ctx.lineTo(-4.5, 1); ctx.lineTo(0.5, 1);
+      ctx.lineTo(-2, 15); ctx.lineTo(4.5, -1); ctx.lineTo(-0.5, -1); ctx.closePath();
+      ctx.fillStyle = "#172554"; ctx.fill();
+
+      ctx.fillStyle = "#0f172a"; ctx.font = "800 7.2px Arial, sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText("Directorate General of Training", 0, 27);
+      ctx.restore();
+    }
+
+    function drawSkillIndiaLogo(cx, cy, s) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(s, s);
+      ctx.fillStyle = "#1e293b"; ctx.fillRect(-17, -26, 34, 20);
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(-14, -23, 28, 14);
+      ctx.fillStyle = "#1e293b"; ctx.fillRect(-4, -6, 8, 2.5); ctx.fillRect(-10, -3.5, 20, 2);
+      ctx.beginPath(); ctx.arc(-2, -16, 5, 0, Math.PI * 2); ctx.fillStyle = "#1e3a8a"; ctx.fill();
+      ctx.fillStyle = "#ea580c"; ctx.fillRect(1, -20, 3, 8);
+
+      ctx.font = "900 16px Arial, sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = "#172554"; ctx.fillText("Sk", -40, 15);
+      ctx.fillStyle = "#ea580c"; ctx.fillRect(-19, 5, 3, 10);
+      ctx.beginPath(); ctx.moveTo(-20.5, 5); ctx.lineTo(-17.5, 1.5); ctx.lineTo(-14.5, 5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#16a34a"; ctx.fillRect(-13.5, 5, 3, 10);
+      ctx.beginPath(); ctx.moveTo(-15, 5); ctx.lineTo(-12, 1.5); ctx.lineTo(-9, 5); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#172554"; ctx.fillText("ll India", -7.5, 15);
+
+      ctx.font = "700 7.4px Arial, sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "#334155";
+      ctx.fillText("कौशल भारत - कुशल भारत", 0, 25);
+      ctx.restore();
+    }
+
+    function drawItiLogo(cx, cy, s) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(s, s);
+      ctx.fillStyle = "#ea580c"; ctx.fillRect(-28, -22, 10, 6); ctx.fillRect(-28, -13, 10, 24);
+      ctx.fillStyle = "#15803d";
+      ctx.beginPath();
+      ctx.moveTo(-15, -14); ctx.lineTo(0, -20); ctx.lineTo(0, -14); ctx.lineTo(15, -20);
+      ctx.lineTo(15, -3); ctx.lineTo(5.5, -3); ctx.lineTo(5.5, 11); ctx.lineTo(-5.5, 11);
+      ctx.lineTo(-5.5, -3); ctx.lineTo(-15, -3); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#1e3a8a"; ctx.fillRect(18, -22, 10, 6); ctx.fillRect(18, -13, 10, 24);
+
+      ctx.fillStyle = "#0f172a"; ctx.font = "800 7.4px Arial, sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillText("Industrial Training Institute", 0, 16);
+      ctx.restore();
+    }
+
+    function drawInstitutionalFooter(W, footerY, footerH, accentColor) {
+      ctx.save();
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, footerY, W, footerH);
+      ctx.fillStyle = "#cbd5e1";
+      ctx.fillRect(0, footerY, W, 3);
+
+      const cy = footerY + footerH / 2;
+      ctx.textAlign = "left";
+      ctx.fillStyle = accentColor;
+      ctx.font = "900 28px Arial, Helvetica, sans-serif";
+      ctx.fillText("NSTI CALICUT", 30, cy - 7);
+      ctx.fillStyle = "#475569";
+      ctx.font = "700 12px Arial, Helvetica, sans-serif";
+      ctx.fillText("KOZHIKODE, KERALAM", 32, cy + 14);
+
+      const d1 = 265;
+      const d2 = W - 285;
+      ctx.fillStyle = "#cbd5e1";
+      ctx.fillRect(d1, footerY + 16, 2, footerH - 32);
+      ctx.fillRect(d2, footerY + 16, 2, footerH - 32);
+
+      const zoneW = d2 - d1;
+      const sc = Math.min(1.12, (footerH - 18) / 66);
+      drawDgtLogo(d1 + zoneW * 0.20, cy - 2, sc);
+      drawSkillIndiaLogo(d1 + zoneW * 0.52, cy + 1, sc);
+      drawItiLogo(d1 + zoneW * 0.83, cy + 2, sc);
+
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#1e293b";
+      ctx.font = "700 12px Arial, Helvetica, sans-serif";
+      ctx.fillText("National Skill Training Institute Calicut,", d2 + 14, cy - 12);
+      ctx.fillText("Kozhikode, Keralam/DGT/MSDE", d2 + 14, cy + 5);
+      ctx.fillStyle = accentColor;
+      ctx.font = "800 13.5px Arial, Helvetica, sans-serif";
+      ctx.fillText(OFFICIAL_SITE, d2 + 14, cy + 24);
+      ctx.restore();
+    }
+
+    /* ================= Drawing Utilities ================= */
+    function wrapText(text, maxW, maxLines = 6) {
+      const words = (text || "").trim().split(/\s+/);
+      const lines = [];
+      let cur = "";
+      for (const w of words) {
+        const test = cur ? cur + " " + w : w;
+        if (ctx.measureText(test).width > maxW && cur) {
+          lines.push(cur);
+          cur = w;
+          if (lines.length >= maxLines) return lines;
+        } else {
+          cur = test;
+        }
+      }
+      if (cur) lines.push(cur);
+      return lines;
+    }
+
+    function drawClippedPhoto(p, box, radius = 0, slantOffset = 0, waveMode = false) {
+      ctx.save();
+      ctx.beginPath();
+      if (radius > 0) {
+        ctx.roundRect(box.x, box.y, box.w, box.h, radius);
+      } else if (waveMode) {
+        ctx.moveTo(box.x, box.y);
+        ctx.quadraticCurveTo(box.x + box.w / 2, box.y + 28, box.x + box.w, box.y);
+        ctx.lineTo(box.x + box.w, box.y + box.h);
+        ctx.quadraticCurveTo(box.x + box.w / 2, box.y + box.h - 28, box.x, box.y + box.h);
+        ctx.closePath();
+      } else if (slantOffset !== 0) {
+        ctx.moveTo(box.x + slantOffset, box.y);
+        ctx.lineTo(box.x + box.w, box.y);
+        ctx.lineTo(box.x + box.w - slantOffset, box.y + box.h);
+        ctx.lineTo(box.x, box.y + box.h);
+        ctx.closePath();
+      } else {
+        ctx.rect(box.x, box.y, box.w, box.h);
+      }
+      ctx.clip();
+
+      if (!p) {
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(box.x, box.y, box.w, box.h);
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "700 26px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Upload Event Photos to Preview", box.x + box.w / 2, box.y + box.h / 2);
+        ctx.restore();
+        return;
+      }
+
+      const iw = p.img.naturalWidth, ih = p.img.naturalHeight;
+      const sc = Math.max(box.w / iw, box.h / ih) * p.zoom;
+      const dw = iw * sc, dh = ih * sc;
+      const dx = box.x + (box.w - dw) * p.fx;
+      const dy = box.y + (box.h - dh) * p.fy;
+      ctx.drawImage(p.img, dx, dy, dw, dh);
+      ctx.restore();
+    }
+
+    function computePhotoCells(area, count) {
+      const cells = [];
+      const n = Math.max(1, Math.min(count, 6));
+      let layout = $("layoutSelect").value;
+      const avgAspect = photos.length
+        ? photos.reduce((s, p) => s + p.aspect, 0) / photos.length
+        : 1.4;
+
+      if (layout === "smart") {
+        if (n === 1) layout = "row";
+        else if (avgAspect >= 1.15) layout = n <= 3 ? "stack" : "grid";
+        else layout = n <= 3 ? "row" : "grid";
+      }
+
+      const gap = 12;
+      if (n === 1 || layout === "row") {
+        const w = (area.w - gap * (n - 1)) / n;
+        for (let i = 0; i < n; i++) cells.push({ i, x: area.x + i * (w + gap), y: area.y, w, h: area.h });
+      } else if (layout === "stack") {
+        const h = (area.h - gap * (n - 1)) / n;
+        for (let i = 0; i < n; i++) cells.push({ i, x: area.x, y: area.y + i * (h + gap), w: area.w, h });
+      } else if (layout === "hero-top") {
+        const h1 = area.h * 0.56 - gap / 2;
+        const h2 = area.h - h1 - gap;
+        cells.push({ i: 0, x: area.x, y: area.y, w: area.w, h: h1 });
+        const rem = n - 1;
+        const w2 = (area.w - gap * (rem - 1)) / rem;
+        for (let j = 0; j < rem; j++) cells.push({ i: j + 1, x: area.x + j * (w2 + gap), y: area.y + h1 + gap, w: w2, h: h2 });
+      } else {
+        const topCount = Math.ceil(n / 2);
+        const botCount = n - topCount;
+        const h = (area.h - gap) / 2;
+        const w1 = (area.w - gap * (topCount - 1)) / topCount;
+        for (let i = 0; i < topCount; i++) cells.push({ i, x: area.x + i * (w1 + gap), y: area.y, w: w1, h });
+        const w2 = (area.w - gap * (botCount - 1)) / botCount;
+        for (let j = 0; j < botCount; j++) cells.push({ i: topCount + j, x: area.x + j * (w2 + gap), y: area.y + h + gap, w: w2, h });
+      }
+      return cells;
+    }
+
+    const THEMES = {
+      navy: { bg1: "#163b6d", bg2: "#09192f", accent: "#0f294a", gold: "#eab308", light: false },
+      gradient: { bg1: "#0f294a", bg2: "#061121", accent: "#0f294a", gold: "#f59e0b", light: false },
+      tricolor: { bg1: "#ffffff", bg2: "#f1f5f9", accent: "#0f294a", gold: "#ea580c", light: true },
+      split: { bg1: "#1e3a8a", bg2: "#0f172a", accent: "#0f294a", gold: "#facc15", light: false },
+      crimson: { bg1: "#991b1b", bg2: "#4c0519", accent: "#881337", gold: "#f59e0b", light: false },
+      gallery: { bg1: "#f8fafc", bg2: "#e2e8f0", accent: "#0f294a", gold: "#155eef", light: true }
+    };
+
+    /* ================= Render Single Instagram Post ================= */
+    function drawSinglePost() {
+      const ratio = $("postRatio").value;
+      const W = 1080;
+      const H = ratio === "1:1" ? 1080 : ratio === "9:16" ? 1920 : 1350;
+      canvas.width = W;
+      canvas.height = H;
+
+      const themeKey = $("themeSelect").value;
+      const pal = THEMES[themeKey] || THEMES.navy;
+      const footerH = 112;
+      const workH = H - footerH;
+
+      const grad = ctx.createLinearGradient(0, 0, W, workH);
+      grad.addColorStop(0, pal.bg1);
+      grad.addColorStop(1, pal.bg2);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      const title = ($("eventTitle").value.trim() || "CAMPUS EVENT AT NSTI CALICUT").toUpperCase();
+      const desc = $("eventDesc").value.trim() || "Highlights from National Skill Training Institute Calicut.";
+      const dt = formatDate($("eventDate").value);
+      const divStyle = $("dividerSelect").value;
+      const rad = divStyle === "rounded" ? 18 : 0;
+      const slant = divStyle === "slant" ? 28 : 0;
+      const wave = divStyle === "wave";
+
+      if (themeKey === "gradient") {
+        const photoArea = { x: 28, y: 28, w: W - 56, h: workH - 56 };
+        sceneCells = computePhotoCells(photoArea, photos.length);
+        sceneCells.forEach((c) => drawClippedPhoto(photos[c.i], c, rad, slant, wave));
+
+        const gFade = ctx.createLinearGradient(0, workH * 0.42, 0, workH);
+        gFade.addColorStop(0, "rgba(9,25,47,0)");
+        gFade.addColorStop(0.55, "rgba(9,25,47,0.82)");
+        gFade.addColorStop(1, "rgba(9,25,47,0.97)");
+        ctx.fillStyle = gFade;
+        ctx.fillRect(28, workH * 0.42, W - 56, workH * 0.58 - 28);
+
+        ctx.fillStyle = pal.gold;
+        ctx.fillRect(58, workH - 295, 175, 32);
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "900 16px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`${dt.day} ${dt.month} ${dt.year}`, 145, workH - 273);
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 40px Arial, sans-serif";
+        let y = workH - 215;
+        wrapText(title, W - 116, 2).forEach((l) => { ctx.fillText(l, 58, y); y += 46; });
+
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "400 22px Arial, sans-serif";
+        wrapText(desc, W - 116, 3).forEach((l) => { ctx.fillText(l, 58, y); y += 30; });
+      } else {
+        if (themeKey === "tricolor") {
+          ctx.fillStyle = "#ea580c"; ctx.fillRect(0, 0, W / 3, 12);
+          ctx.fillStyle = "#ffffff"; ctx.fillRect(W / 3, 0, W / 3, 12);
+          ctx.fillStyle = "#16a34a"; ctx.fillRect((W * 2) / 3, 0, W / 3, 12);
+        }
+
+        ctx.fillStyle = pal.gold;
+        ctx.fillRect(48, 42, 175, 34);
+        ctx.fillStyle = pal.light ? "#ffffff" : "#0f172a";
+        ctx.font = "900 16px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`${dt.day} ${dt.month} ${dt.year}`, 135, 64);
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = pal.light ? "#0f294a" : "#ffffff";
+        ctx.font = "900 40px Arial, sans-serif";
+        let ty = 122;
+        wrapText(title, W - 96, 2).forEach((l) => { ctx.fillText(l, 48, ty); ty += 46; });
+
+        const pY = ty + 8;
+        const pH = Math.round((workH - pY) * 0.68);
+        const photoArea = { x: 48, y: pY, w: W - 96, h: pH };
+        sceneCells = computePhotoCells(photoArea, photos.length);
+        sceneCells.forEach((c) => drawClippedPhoto(photos[c.i], c, rad, slant, wave));
+
+        ctx.fillStyle = pal.light ? "#334155" : "rgba(255,255,255,0.92)";
+        ctx.font = "400 23px Arial, sans-serif";
+        let dy = pY + pH + 42;
+        wrapText(desc, W - 96, 5).forEach((l) => {
+          if (dy < workH - 18) { ctx.fillText(l, 48, dy); dy += 32; }
+        });
+      }
+
+      drawInstitutionalFooter(W, H - footerH, footerH, pal.accent);
+    }
+
+    /* ================= Render Swipeable Multi-Slide Carousel ================= */
+    function getTotalCarouselSlides() {
+      return Math.max(2, photos.length + 2);
+    }
+
+    function drawCarouselSlide(slideIndex) {
+      const W = 1080, H = 1350;
+      canvas.width = W;
+      canvas.height = H;
+      const total = getTotalCarouselSlides();
+      const pal = THEMES[$("themeSelect").value] || THEMES.navy;
+      const footerH = 112;
+      const workH = H - footerH;
+
+      const grad = ctx.createLinearGradient(0, 0, W, workH);
+      grad.addColorStop(0, pal.bg1);
+      grad.addColorStop(1, pal.bg2);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      const title = ($("eventTitle").value.trim() || "CAMPUS EVENT AT NSTI CALICUT").toUpperCase();
+      const desc = $("eventDesc").value.trim();
+      const dt = formatDate($("eventDate").value);
+
+      if (slideIndex === 0) {
+        // Slide 1: Hook Cover
+        sceneCells = [{ i: 0, x: 48, y: 48, w: W - 96, h: 660 }];
+        drawClippedPhoto(photos[0], sceneCells[0], 20);
+
+        ctx.fillStyle = pal.gold;
+        ctx.fillRect(48, 745, 180, 34);
+        ctx.fillStyle = pal.light ? "#ffffff" : "#0f172a";
+        ctx.font = "900 16px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`${dt.day} ${dt.month} ${dt.year}`, 138, 767);
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = pal.light ? "#0f294a" : "#ffffff";
+        ctx.font = "900 46px Arial, sans-serif";
+        let y = 835;
+        wrapText(title, W - 96, 3).forEach((l) => { ctx.fillText(l, 48, y); y += 54; });
+
+        // Swipe CTA Pill
+        ctx.fillStyle = pal.gold;
+        ctx.beginPath();
+        ctx.roundRect(W - 250, workH - 72, 202, 44, 22);
+        ctx.fill();
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "900 18px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("SWIPE FOR MORE →", W - 149, workH - 44);
+      } else if (slideIndex === total - 1) {
+        // Final Slide: Summary & CTA
+        sceneCells = [];
+        ctx.fillStyle = pal.gold;
+        ctx.fillRect(68, 120, 120, 8);
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = pal.light ? "#0f294a" : "#ffffff";
+        ctx.font = "900 44px Arial, sans-serif";
+        let y = 195;
+        wrapText(title, W - 136, 3).forEach((l) => { ctx.fillText(l, 68, y); y += 52; });
+
+        y += 24;
+        ctx.fillStyle = pal.light ? "#334155" : "#e2e8f0";
+        ctx.font = "400 28px Arial, sans-serif";
+        wrapText(desc, W - 136, 9).forEach((l) => { ctx.fillText(l, 68, y); y += 40; });
+
+        ctx.fillStyle = pal.gold;
+        ctx.beginPath();
+        ctx.roundRect(68, workH - 140, W - 136, 76, 14);
+        ctx.fill();
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "900 24px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`VISIT OFFICIAL PORTAL: ${OFFICIAL_SITE}`, W / 2, workH - 94);
+      } else {
+        // Middle Photo Slides
+        const pIdx = slideIndex - 1;
+        const p = photos[pIdx];
+        sceneCells = [{ i: pIdx, x: 44, y: 44, w: W - 88, h: workH - 165 }];
+        drawClippedPhoto(p, sceneCells[0], 18);
+
+        const caption = (p && p.label) ? p.label : `Event Highlight ${slideIndex} of ${total - 2}`;
+        ctx.fillStyle = pal.light ? "#0f294a" : "#ffffff";
+        ctx.font = "800 30px Arial, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(caption, 48, workH - 55, W - 180);
+
+        ctx.fillStyle = pal.gold;
+        ctx.font = "900 22px Arial, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(`${slideIndex + 1} / ${total}`, W - 48, workH - 55);
+      }
+
+      drawInstitutionalFooter(W, H - footerH, footerH, pal.accent);
+    }
+
+    /* ================= Render Reel Frame (9:16 — 1080 x 1920) ================= */
+    function drawReelFrame(progress, forExport = false) {
+      const
